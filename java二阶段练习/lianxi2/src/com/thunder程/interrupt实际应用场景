@@ -1,0 +1,51 @@
+interrupt 的三大应用场景
+场景一：优雅关闭线程池
+复制
+// 服务关闭时，通知所有工作线程停止
+ExecutorService executor = Executors.newFixedThreadPool(10);
+
+// 启动工作线程
+for (int i = 0; i < 10; i++) {
+    executor.submit(() -> {
+        while (!Thread.currentThread().isInterrupted()) {
+            doWork();
+        }
+        System.out.println("线程已关闭");
+    });
+}
+
+// 服务关闭时
+executor.shutdownNow();  // 内部会对所有线程调用 interrupt()
+场景二：超时控制
+复制
+Thread worker = new Thread(() -> {
+    while (!Thread.currentThread().isInterrupted()) {
+        // 执行任务
+    }
+});
+
+worker.start();
+
+// 5秒后强制结束
+new Timer().schedule(() -> {
+    worker.interrupt();
+}, 5000);
+场景三：唤醒阻塞中的线程
+复制
+// 等待用户输入的线程
+Thread inputThread = new Thread(() -> {
+    try {
+        System.in.read();  // 阻塞等待输入
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+});
+
+inputThread.start();
+
+// 3秒后强制退出等待
+Thread.sleep(3000);
+inputThread.interrupt();  // 唤醒阻塞的线程
+一句话总结
+interrupt 用于：优雅关闭、超时控制、唤醒阻塞。
+它不是强制停止，而是发送"该走了"的信号 🔮

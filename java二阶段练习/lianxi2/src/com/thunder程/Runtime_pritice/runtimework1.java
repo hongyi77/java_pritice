@@ -6,7 +6,7 @@ public class runtimework1 {
         Thread thread = new Thread(re);
         Thread thread1 = new Thread(re);
         thread.setName("线程1");
-        thread.setName("线程2");
+        thread1.setName("线程2");
         thread.start();
         thread1.start();
 
